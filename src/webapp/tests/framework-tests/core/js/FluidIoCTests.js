@@ -116,6 +116,14 @@ fluid.registerNamespace("fluid.tests");
         }
     });
     
+    fluid.defaults("fluid.tests.invokerComponent3", {
+        gradeNames: ["fluid.littleComponent", "autoInit"],
+        invokers: {
+            someInvoker: null
+        },
+        finalInitFunction: "fluid.tests.invokerComponent3.finalInit"
+    });
+    
     fluid.demands("stringRenderer", "fluid.tests.invokerComponent2", {
         funcName: "fluid.formatMessage",
         args: ["{invokerComponent2}.options.template", "@0"]       
@@ -207,7 +215,34 @@ fluid.registerNamespace("fluid.tests");
         jqUnit.assertEquals("Rendered", "Every CATT has 4 Leg(s)", 
             that.render(["CATT", "4", "Leg"]));
     });
-
+    
+    fluid.tests.invokerComponent3.finalInit = function (that) {
+        if (that.someInvoker) {
+            jqUnit.assertTrue("Yes someInvoker is here and it says hello!", true);
+            that.someInvoker();
+        }  
+    };
+    
+    fluid.tests.invokerComponent3.someInvoker = function () {
+        jqUnit.assertTrue("Invoker is here and says hello!", true);
+    };
+    
+    fluidIoCTests.test("invokers: invoker is not set. Dead silence in our component.", function () {
+        jqUnit.expect(1);
+        fluid.tests.invokerComponent3();
+        jqUnit.assertValue("Constructed", that);
+    });
+    
+    fluidIoCTests.test("invokers: invoker is set and we are executing it!", function () {
+        jqUnit.expect(3);
+        var options = {
+            invokers: {
+                someInvoker: "fluid.tests.invokerComponent3.someInvoker"
+            }
+        };
+        var that = fluid.tests.invokerComponent3(options);
+        jqUnit.assertValue("Constructed", that);
+    });
 
     fluidIoCTests.test("Aliasing expander test", function () {
         jqUnit.expect(3);
