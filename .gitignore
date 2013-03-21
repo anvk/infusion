@@ -1,3 +1,4 @@
-build/
+build/pretreated
+build/war
 products/
 src/webapp/components/uiOptions/css/fss/
